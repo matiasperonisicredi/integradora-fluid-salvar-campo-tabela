@@ -11,8 +11,20 @@ function formatarData(valor) {
   return valor;
 }
 
+// Função para normalizar os valores dos campos
+function normalizarValor(campo) {
+  if (campo.ttableId === 6212) {
+    campo.value = formatarData(campo.value);
+  } else if (campo.value === "None") {
+    campo.value = null;
+  } else if (!isNaN(campo.value) && typeof campo.value === "string") {
+    campo.value = parseFloat(campo.value);
+  }
+}
+
 export async function PUT(request, context) {
-  const { num_processo, id_nodo, id_usuario } = context.params;
+  const params = await context.params;
+  const { num_processo, id_nodo, id_usuario } = params;
 
   try {
     const { payload } = await request.json();
@@ -27,6 +39,10 @@ export async function PUT(request, context) {
     let body;
     try {
       body = JSON.parse(payload);
+      console.log(
+        "📦 Body recebido (antes da formatação):",
+        JSON.stringify(body, null, 2)
+      );
     } catch (e) {
       return NextResponse.json(
         { error: "Payload não é um JSON válido." },
@@ -34,20 +50,16 @@ export async function PUT(request, context) {
       );
     }
 
-    console.log("body antes da formatação:", body);
-
-    // Formata datas no campo ttableId === 6212
-    for (const tableId in body.tables) {
-      const table = body.tables[tableId];
-      for (const lineId in table.lines) {
-        const campos = table.lines[lineId];
-        for (const campo of campos) {
-          if (campo.ttableId === 6212) {
-            campo.value = formatarData(campo.value);
-          }
-        }
-      }
-    }
+    // // Formata os campos
+    // for (const tableId in body.tables) {
+    //   const table = body.tables[tableId];
+    //   for (const lineId in table.lines) {
+    //     const campos = table.lines[lineId];
+    //     for (const campo of campos) {
+    //       normalizarValor(campo);
+    //     }
+    //   }
+    // }
 
     const token = process.env.API_TOKEN;
     if (!token) {
@@ -59,7 +71,7 @@ export async function PUT(request, context) {
 
     const externalEndpoint = `https://0221.fluid.sicredi.io/pato/process/api/v2/process/${num_processo}/node/${id_nodo}/form/table/row`;
 
-    console.log("body após a formatação:", body);
+    console.log("📤 Body após a formatação:", JSON.stringify(body, null, 2));
 
     const response = await fetch(externalEndpoint, {
       method: "PUT",
@@ -82,7 +94,7 @@ export async function PUT(request, context) {
       { status: response.status }
     );
   } catch (error) {
-    console.error("Erro ao processar a requisição:", error);
+    console.error("❌ Erro ao processar a requisição:", error);
     return NextResponse.json(
       { error: "Erro interno no servidor." },
       { status: 500 }
