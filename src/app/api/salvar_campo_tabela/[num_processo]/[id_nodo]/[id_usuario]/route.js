@@ -15,11 +15,14 @@ function formatarData(valor) {
 function normalizarValor(campo) {
   if (campo.ttableId === 6212) {
     campo.value = formatarData(campo.value);
-  } else if (campo.value === "None") {
-    campo.value = null;
-  } else if (!isNaN(campo.value) && typeof campo.value === "string") {
-    campo.value = parseFloat(campo.value);
   }
+
+  if (campo.value === "None" || campo.value === null) {
+    campo.value = "";
+  }
+
+  // Garante que o valor seja string
+  campo.value = String(campo.value);
 }
 
 export async function PUT(request, context) {
@@ -33,10 +36,8 @@ export async function PUT(request, context) {
     let body;
 
     try {
-      // Primeiro parse se for string
       const firstParse =
         typeof payload === "string" ? JSON.parse(payload) : payload;
-      // Segundo parse se ainda for string
       body =
         typeof firstParse === "string" ? JSON.parse(firstParse) : firstParse;
     } catch (e) {
