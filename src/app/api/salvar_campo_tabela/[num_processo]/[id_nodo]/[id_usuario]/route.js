@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
-// Função para converter "15,11,2040" → "2040-11-15"
+// Função para converter "15,11,2040" → "15/11/2040"
 function formatarData(valor) {
   if (typeof valor === "string" && valor.includes(",")) {
     const [dia, mes, ano] = valor.split(",");
     if (dia && mes && ano) {
-      return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+      return `${dia.padStart(2, "0")}/${mes.padStart(2, "0")}/${ano}`;
     }
   }
   return valor;
@@ -34,7 +34,7 @@ export async function PUT(request, context) {
       );
     }
 
-    console.log("body antes da formatação:", body)
+    console.log("body antes da formatação:", body);
 
     // Formata datas no campo ttableId === 6212
     for (const tableId in body.tables) {
@@ -58,7 +58,9 @@ export async function PUT(request, context) {
     }
 
     const externalEndpoint = `https://0221.fluid.sicredi.io/pato/process/api/v2/process/${num_processo}/node/${id_nodo}/form/table/row`;
-    console.log("body após da formatação:", body);
+
+    console.log("body após a formatação:", body);
+
     const response = await fetch(externalEndpoint, {
       method: "PUT",
       headers: {
