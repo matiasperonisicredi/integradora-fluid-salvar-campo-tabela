@@ -32,21 +32,16 @@ export async function PUT(request, context) {
 
     let body;
 
-    // Se payload for string, tenta fazer o parse
-    if (typeof payload === "string") {
-      try {
-        body = JSON.parse(payload);
-      } catch (e) {
-        return NextResponse.json(
-          { error: "Payload não é um JSON válido." },
-          { status: 400 }
-        );
-      }
-    } else if (typeof payload === "object") {
-      body = payload;
-    } else {
+    try {
+      // Primeiro parse se for string
+      const firstParse =
+        typeof payload === "string" ? JSON.parse(payload) : payload;
+      // Segundo parse se ainda for string
+      body =
+        typeof firstParse === "string" ? JSON.parse(firstParse) : firstParse;
+    } catch (e) {
       return NextResponse.json(
-        { error: "Formato de payload inválido." },
+        { error: "Payload não é um JSON válido." },
         { status: 400 }
       );
     }
