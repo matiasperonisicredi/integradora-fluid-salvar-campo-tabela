@@ -29,6 +29,10 @@ export async function PUT(request, context) {
   const params = await context.params;
   const { num_processo, id_nodo, id_usuario } = params;
 
+  console.log("Nº PROCESSO", num_processo);
+  console.log("Nº NODO", id_nodo);
+  console.log("Nº USUARIO", id_usuario);
+
   try {
     const { payload } = await request.json();
     console.log("📤 PAYLOAD recebido:", payload);
