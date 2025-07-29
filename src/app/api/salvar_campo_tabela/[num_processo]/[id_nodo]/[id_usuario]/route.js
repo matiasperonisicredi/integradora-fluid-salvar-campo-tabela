@@ -34,6 +34,8 @@ export async function PUT(request, context) {
       );
     }
 
+    console.log("body antes da formatação:", body)
+
     // Formata datas no campo ttableId === 6212
     for (const tableId in body.tables) {
       const table = body.tables[tableId];
@@ -56,7 +58,7 @@ export async function PUT(request, context) {
     }
 
     const externalEndpoint = `https://0221.fluid.sicredi.io/pato/process/api/v2/process/${num_processo}/node/${id_nodo}/form/table/row`;
-
+    console.log("body após da formatação:", body);
     const response = await fetch(externalEndpoint, {
       method: "PUT",
       headers: {
