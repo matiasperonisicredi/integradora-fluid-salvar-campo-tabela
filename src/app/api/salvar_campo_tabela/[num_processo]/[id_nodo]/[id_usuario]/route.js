@@ -80,7 +80,7 @@ export async function PUT(request, context) {
         Authorization: `${token}`,
         "Target-User-ID": id_usuario,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body, null, 2),
     });
 
     const responseData = await response.json();
