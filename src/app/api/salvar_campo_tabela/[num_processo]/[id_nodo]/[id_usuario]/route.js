@@ -11,11 +11,28 @@ function formatarData(valor) {
   return valor;
 }
 
-export async function PUT(request, { params }) {
-  const { num_processo, id_nodo, id_usuario } = params;
+export async function PUT(request, context) {
+  const { num_processo, id_nodo, id_usuario } = context.params;
 
   try {
-    const body = await request.json();
+    const { payload } = await request.json();
+
+    if (!payload || typeof payload !== "string") {
+      return NextResponse.json(
+        { error: "Payload ausente ou inválido." },
+        { status: 400 }
+      );
+    }
+
+    let body;
+    try {
+      body = JSON.parse(payload);
+    } catch (e) {
+      return NextResponse.json(
+        { error: "Payload não é um JSON válido." },
+        { status: 400 }
+      );
+    }
 
     // Formata datas no campo ttableId === 6212
     for (const tableId in body.tables) {
