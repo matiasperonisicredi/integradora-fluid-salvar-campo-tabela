@@ -28,6 +28,7 @@ export async function PUT(request, context) {
 
   try {
     const { payload } = await request.json();
+    console.log("📤PAYLOAD :", payload);
 
     if (!payload || typeof payload !== "string") {
       return NextResponse.json(
@@ -38,6 +39,7 @@ export async function PUT(request, context) {
 
     let body;
     try {
+      
       body = JSON.parse(payload);
       console.log(
         "📦 Body recebido (antes da formatação):",
@@ -50,16 +52,16 @@ export async function PUT(request, context) {
       );
     }
 
-    // // Formata os campos
-    // for (const tableId in body.tables) {
-    //   const table = body.tables[tableId];
-    //   for (const lineId in table.lines) {
-    //     const campos = table.lines[lineId];
-    //     for (const campo of campos) {
-    //       normalizarValor(campo);
-    //     }
-    //   }
-    // }
+    // Formata os campos
+    for (const tableId in body.tables) {
+      const table = body.tables[tableId];
+      for (const lineId in table.lines) {
+        const campos = table.lines[lineId];
+        for (const campo of campos) {
+          normalizarValor(campo);
+        }
+      }
+    }
 
     const token = process.env.API_TOKEN;
     if (!token) {
