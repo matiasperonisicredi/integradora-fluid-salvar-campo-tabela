@@ -28,29 +28,33 @@ export async function PUT(request, context) {
 
   try {
     const { payload } = await request.json();
-    console.log("📤PAYLOAD :", payload);
-
-    if (!payload || typeof payload !== "string") {
-      return NextResponse.json(
-        { error: "Payload ausente ou inválido." },
-        { status: 400 }
-      );
-    }
+    console.log("📤 PAYLOAD recebido:", payload);
 
     let body;
-    try {
-      
-      body = JSON.parse(payload);
-      console.log(
-        "📦 Body recebido (antes da formatação):",
-        JSON.stringify(body, null, 2)
-      );
-    } catch (e) {
+
+    // Se payload for string, tenta fazer o parse
+    if (typeof payload === "string") {
+      try {
+        body = JSON.parse(payload);
+      } catch (e) {
+        return NextResponse.json(
+          { error: "Payload não é um JSON válido." },
+          { status: 400 }
+        );
+      }
+    } else if (typeof payload === "object") {
+      body = payload;
+    } else {
       return NextResponse.json(
-        { error: "Payload não é um JSON válido." },
+        { error: "Formato de payload inválido." },
         { status: 400 }
       );
     }
+
+    console.log(
+      "📦 Body recebido (antes da formatação):",
+      JSON.stringify(body, null, 2)
+    );
 
     // Formata os campos
     for (const tableId in body.tables) {
@@ -82,7 +86,7 @@ export async function PUT(request, context) {
         Authorization: `${token}`,
         "Target-User-ID": id_usuario,
       },
-      body: JSON.stringify(body, null, 2),
+      body: JSON.stringify(body),
     });
 
     const responseData = await response.json();
